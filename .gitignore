@@ -1,0 +1,11 @@
+pinger.conf
+
+#	Common
+#---------
+
+# Vim temp files
+.*.sw[a-z]
+
+#	Python
+#---------
+*.pyc

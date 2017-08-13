@@ -5,32 +5,34 @@ import dns.resolver
 
 class Config:
 	# Number of ICMP packets per measurment
-	echo_count = 10
+	echoCount = 10
 	
 	# Milliseconds
-	ping_timeout = 3000
+	echoTimeout = 3000
 	
-	# <min avg ms> <min lost %> <css color>
+	# <min avg ms> <min loss %> <css color>
 	colors = [
 		{
 			'minAvg': 0,
-			'minLost': 0,
+			'minLoss': 0,
 			'color': '#00FF01'
 		},
 		{
 			'minAvg': -1,
-			'minLost': -1,
+			'minLoss': -1,
 			'color': '#000000'
 		}
 	]
 	
 	# First symbols
-	display_desc = 12
+	displayDesc = 12
 	
 	# Last octets
-	display_ip = 2
-
+	displayIp = 2
+	
 	hosts = []
+	
+	eventTimeout = 1
 	
 	def __init__ (self, path = 'pinger.conf'):
 		
@@ -50,30 +52,30 @@ class Config:
 			
 			param = m.group(1)
 			value = m.group(2)
-			if param == 'echo_count':
-				self.echo_count = int(value)
-			elif param == 'ping_timeout':
-				self.ping_timeout = int(value)
-			elif param == 'display_desc':
-				self.display_desc = int(value)
-			elif param == 'display_ip':
-				self.display_ip = min(4, int(value))
+			if param == 'echoCount':
+				self.echoCount = int(value)
+			elif param == 'echoTimeout':
+				self.echoTimeout = int(value)
+			elif param == 'displayDesc':
+				self.displayDesc = int(value)
+			elif param == 'displayIp':
+				self.displayIp = min(4, int(value))
 			elif param == 'color':
 				m = re.search('^((\d+) +(\d+)|none) +(#[0-9a-fA-F]+)$', value)
 				if m:
 					if m.group(1) == 'none':
-						color = {'minAvg': -1, 'minLost': -1, 'color': m.group(4)}
+						color = {'minAvg': -1, 'minLoss': -1, 'color': m.group(4)}
 					else:
-						color = {'minAvg': int(m.group(2)), 'minLost': int(m.group(3)), 'color': m.group(4)}
+						color = {'minAvg': int(m.group(2)), 'minLoss': int(m.group(3)), 'color': m.group(4)}
 					
-					if (color['minAvg'] == -1) or (color['minLost'] == -1):
-						color['minAvg'] = color['minLost'] = -1
+					if (color['minAvg'] == -1) or (color['minLoss'] == -1):
+						color['minAvg'] = color['minLoss'] = -1
 					
 					i = 0
 					found = False
 					while (i < len(self.colors)) and not found:
 						stored = self.colors[i]
-						if (color['minAvg'] == stored['minAvg']) and (color['minLost'] == stored['minLost']):
+						if (color['minAvg'] == stored['minAvg']) and (color['minLoss'] == stored['minLoss']):
 							stored['color'] = color['color']
 							found = True
 						else:
@@ -90,4 +92,4 @@ class Config:
 							pass
 						self.hosts.append({'ip': str(ip), 'desc': desc})
 					except:
-						pass
+						self.hosts.append({'ip': '0.0.0.0', 'desc': desc})

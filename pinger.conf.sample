@@ -1,8 +1,8 @@
 # Number of ICMP packets per measurment
-echo_count = 10
+echoCount = 10
 
-# Milliseconds
-ping_timeout = 3000
+# Seconds
+echoTimeout = 1
 
 # <min avg ms> <min lost %> <css color>
 color = 0 0 #00FF01
@@ -11,10 +11,10 @@ color = 1000 20 #FFFF00
 color = none #000000
 
 # First symbols
-display_desc = 12
+displayDesc = 12
 
 # Last octets
-display_ip = 2
+displayIp = 2
 
 # <ip | hostname> <description>
 host = woland.me John Fox Woland

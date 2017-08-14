@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re
+import os, sys, re
 from subprocess import Popen, PIPE
 
 class Config:
@@ -37,12 +37,16 @@ class Config:
 	
 	eventTimeout = 1
 	
-	def __init__ (self, path = 'pinger.conf'):
+	pidFile = 'pid'
+	appDir = os.path.dirname(sys.argv[0])
+	
+	def __init__ (self, cfgPath = 'pinger.conf'):
 		
-		if not os.path.exists(path):
+		cfgPath = self.appDirFile(cfgPath)
+		if not cfgPath:
 			raise Exception('Configuration file not found')
 		
-		c = open(path, 'r')
+		c = open(cfgPath, 'r')
 		s = True
 		while s:
 			s = c.readline()
@@ -110,20 +114,9 @@ class Config:
 					if ip:
 						ip = host
 					else:
-						# PING ya.ru (87.250.250.242)
-						# PING 1.2.3.4 (1.2.3.4)
-						# :empty output on non existent hostname:
-						ping = self.ping(host, oneTime = True)
-						proc = Popen(ping, stdout = PIPE, stderr = PIPE)
-						(out, err) = proc.communicate()
-						
-						m = re.search('^PING %s \\((\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\)' % host, out)
-						if m:
-							ip = m.group(1)
-						else:
-							ip = '0.0.0.0'
+						ip = None
 					
-					self.hosts.append({'ip': ip, 'desc': desc})
+					self.hosts.append({'host': host, 'ip': ip, 'desc': desc})
 		
 	def ping (self, host = None, oneTime = False):
 		if oneTime:
@@ -138,3 +131,14 @@ class Config:
 			ping.append(host)
 		
 		return ping
+	
+	def appDirFile (self, fileName):
+		if fileName[0] == '/':
+			path = fileName
+		else:
+			path = os.path.join(self.appDir, fileName)
+		
+		if os.path.exists(path):
+			return path
+		
+		return None

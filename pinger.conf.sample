@@ -8,10 +8,13 @@ echoTimeout = 1
 pingInterval = 60
 
 # <min avg ms> <min lost %> <css color>
+# Mandatory colors
+color = none #000000
 color = 0 0 #00FF01
+color = 100000 100 #FE0000
+# Optional colors
 color = 100 5 #FFFF80
 color = 1000 20 #FFFF00
-color = none #000000
 
 # First symbols
 displayDesc = 12
@@ -24,3 +27,4 @@ host = woland.me John Fox Woland
 host = 194.61.67.86 Пермь
 host = ya.ru Yandex
 host = nonexistent.host Description of the host
+host = 1.2.3.4 Unreachable host

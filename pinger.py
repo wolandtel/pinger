@@ -5,7 +5,6 @@ if __name__ == '__main__':
 	from lib.Config import Config
 	cfg = Config()
 	
-	import os
 	from lib.Event import Event
 	from lib.Probe import Probe
 	event = Event()
@@ -15,7 +14,7 @@ if __name__ == '__main__':
 		probes.append(probe)
 		probe.start()
 	
-	while os.path.exists('r'):
+	while cfg.appDirFile(cfg.pidFile):
 		event.wait(cfg.eventTimeout)
 		if (event.isSet()):
 			for p in event.probeIdxs:

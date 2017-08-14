@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os, re
-import dns.resolver
+from subprocess import Popen, PIPE
 
 class Config:
 	# Number of ICMP packets per measurment
@@ -87,9 +87,22 @@ class Config:
 				if m:
 					host = m.group(1)
 					desc = m.group(2)
-					try:
-						for ip in dns.resolver.query(host, 'A'):
-							pass
-						self.hosts.append({'ip': str(ip), 'desc': desc})
-					except:
+					# PING ya.ru (87.250.250.242)
+					# PING 1.2.3.4 (1.2.3.4)
+					# :empty output on non existent hostname:
+					ping = self.ping(host)
+					proc = Popen(ping, stdout = PIPE)
+					(out, err) = proc.communicate()
+					
+					m = re.search('^PING %s \\((\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\)' % host, out)
+					if m:
+						self.hosts.append({'ip': m.group(1), 'desc': desc})
+					else:
 						self.hosts.append({'ip': '0.0.0.0', 'desc': desc})
+		
+	def ping (self, host = None):
+		ping = ['/bin/ping', '-qc%d' % self.echoCount, '-W%d' % self.echoTimeout]
+		if host:
+			ping.append(host)
+		
+		return ping

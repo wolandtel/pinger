@@ -29,7 +29,8 @@ class Probe (Thread):
 		
 		while self.__running:
 			self.__changed = False
-			proc = Popen(['/bin/ping', '-qnc%d' % self.__cfg.echoCount, '-W%d' % self.__cfg.echoTimeout, self.__ip], stdout = PIPE)
+			ping = self.__cfg.ping(self.__ip)
+			proc = Popen(ping, stdout = PIPE)
 			(out, err) = proc.communicate()
 			found = 0
 			for s in out.split('\n'):

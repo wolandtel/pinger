@@ -87,18 +87,38 @@ class Config:
 				if m:
 					host = m.group(1)
 					desc = m.group(2)
-					# PING ya.ru (87.250.250.242)
-					# PING 1.2.3.4 (1.2.3.4)
-					# :empty output on non existent hostname:
-					ping = self.ping(host)
-					proc = Popen(ping, stdout = PIPE, stderr = PIPE)
-					(out, err) = proc.communicate()
 					
-					m = re.search('^PING %s \\((\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\)' % host, out)
+					ip = False
+					m = re.search('^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$', host)
 					if m:
-						self.hosts.append({'ip': m.group(1), 'desc': desc})
+						ip = True
+						for i in range(1, 5):
+							try:
+								if int(m.group(i)) > 255:
+									ip = False
+							except:
+								ip = False
+							
+							if not ip:
+								break;
+					
+					if ip:
+						ip = host
 					else:
-						self.hosts.append({'ip': '0.0.0.0', 'desc': desc})
+						# PING ya.ru (87.250.250.242)
+						# PING 1.2.3.4 (1.2.3.4)
+						# :empty output on non existent hostname:
+						ping = self.ping(host)
+						proc = Popen(ping, stdout = PIPE, stderr = PIPE)
+						(out, err) = proc.communicate()
+						
+						m = re.search('^PING %s \\((\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\)' % host, out)
+						if m:
+							ip = m.group(1)
+						else:
+							ip = '0.0.0.0'
+					
+					self.hosts.append({'ip': ip, 'desc': desc})
 		
 	def ping (self, host = None):
 		ping = ['/bin/ping', '-qc%d' % self.echoCount, '-W%d' % self.echoTimeout]

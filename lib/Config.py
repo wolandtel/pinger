@@ -10,6 +10,9 @@ class Config:
 	# Milliseconds
 	echoTimeout = 3000
 	
+	# Seconds
+	pingInterval = 60
+	
 	# <min avg ms> <min loss %> <css color>
 	colors = [
 		{
@@ -56,6 +59,8 @@ class Config:
 				self.echoCount = int(value)
 			elif param == 'echoTimeout':
 				self.echoTimeout = int(value)
+			elif param == 'pingInterval':
+				self.pingInterval = int(value)
 			elif param == 'displayDesc':
 				self.displayDesc = int(value)
 			elif param == 'displayIp':
@@ -108,7 +113,7 @@ class Config:
 						# PING ya.ru (87.250.250.242)
 						# PING 1.2.3.4 (1.2.3.4)
 						# :empty output on non existent hostname:
-						ping = self.ping(host)
+						ping = self.ping(host, oneTime = True)
 						proc = Popen(ping, stdout = PIPE, stderr = PIPE)
 						(out, err) = proc.communicate()
 						
@@ -120,8 +125,15 @@ class Config:
 					
 					self.hosts.append({'ip': ip, 'desc': desc})
 		
-	def ping (self, host = None):
-		ping = ['/bin/ping', '-qc%d' % self.echoCount, '-W%d' % self.echoTimeout]
+	def ping (self, host = None, oneTime = False):
+		if oneTime:
+			count = 1
+			timeout = 1
+		else:
+			count = self.echoCount
+			timeout = self.echoTimeout
+		
+		ping = ['/bin/ping', '-qc%d' % count, '-W%d' % timeout]
 		if host:
 			ping.append(host)
 		

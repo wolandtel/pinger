@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re
+import os, re, time
 from threading import Thread
 from subprocess import Popen, PIPE
 
@@ -48,7 +48,7 @@ class Probe (Thread):
 			if found == 3:
 				
 				for c in self.__cfg.colors:
-					if (self.__loss >= c['minLoss']) and (self.__avg >= c['minAvg']) and (not colorDef or (c['minLoss'] >= colorDef['minLoss'] ) and (c['minAvg'] >= colorDef['minAvg'])):
+					if ((self.__loss >= c['minLoss']) or (self.__avg >= c['minAvg'])) and (not colorDef or (c['minLoss'] >= colorDef['minLoss'] ) or (c['minAvg'] >= colorDef['minAvg'])):
 						colorDef = c
 				
 				if self.color != colorDef['color']:
@@ -57,6 +57,11 @@ class Probe (Thread):
 			
 			if self.__changed:
 				self.__onChange()
+
+			interval = self.__cfg.pingInterval
+			while self.__running and (interval > 0):
+				time.sleep(1)
+				interval -= 1
 	
 	def __onChange (self):
 		self.__eventOnChange.set(self.__idx)

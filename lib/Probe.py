@@ -39,7 +39,7 @@ class Probe (Thread):
 					self.__loss = int(m.group(1))
 					found |= 1
 				else:
-					m = re.search('rtt min/avg/max/mdev = ([0-9.]+)/([0-9.]+)/([0-9.]+)/([0-9.]+) ms', s)
+					m = re.search('(?:rtt|round-trip) min/avg/max(?:/mdev|) = ([0-9.]+)/([0-9.]+)/([0-9.]+)(?:/([0-9.]+)|) ms', s)
 					if m:
 						found |= 2
 						self.__avg = float(m.group(2))

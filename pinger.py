@@ -15,10 +15,6 @@ if __name__ == '__main__':
 		probes.append(probe)
 		probe.start()
 	
-	for probe in probes:
-		probe.stop()
-	
-
 	while os.path.exists('r'):
 		event.wait(cfg.eventTimeout)
 		if (event.isSet()):
@@ -27,6 +23,9 @@ if __name__ == '__main__':
 				print probe.desc
 				print probe.color
 			event.clear()
+	
+	for probe in probes:
+		probe.stop()
 	
 	for probe in probes:
 		probe.join()

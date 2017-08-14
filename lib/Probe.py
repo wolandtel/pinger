@@ -30,7 +30,7 @@ class Probe (Thread):
 		while self.__running:
 			self.__changed = False
 			ping = self.__cfg.ping(self.__ip)
-			proc = Popen(ping, stdout = PIPE)
+			proc = Popen(ping, stdout = PIPE, stderr = PIPE)
 			(out, err) = proc.communicate()
 			found = 0
 			for s in out.split('\n'):

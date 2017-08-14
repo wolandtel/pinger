@@ -91,7 +91,7 @@ class Config:
 					# PING 1.2.3.4 (1.2.3.4)
 					# :empty output on non existent hostname:
 					ping = self.ping(host)
-					proc = Popen(ping, stdout = PIPE)
+					proc = Popen(ping, stdout = PIPE, stderr = PIPE)
 					(out, err) = proc.communicate()
 					
 					m = re.search('^PING %s \\((\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})\\)' % host, out)

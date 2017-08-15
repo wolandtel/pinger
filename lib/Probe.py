@@ -48,7 +48,7 @@ class Probe (Thread):
 				proc = Popen(ping, stdout = PIPE, stderr = PIPE)
 			except OSError as e:
 				self.__glb.pings -= 1
-				if e.errno.errorcode != errno.ENOMEM:
+				if e.errno != errno.ENOMEM:
 					raise e
 				if self.__cfg.simultaneousPings > 1:
 					self.__cfg.simultaneousPings -= 1

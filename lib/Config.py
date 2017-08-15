@@ -4,6 +4,8 @@ import os, sys, re
 from subprocess import Popen, PIPE
 
 class Config:
+	httpPort = 8080
+	
 	# Number of ICMP packets per measurment
 	echoCount = 10
 	
@@ -59,7 +61,9 @@ class Config:
 			
 			param = m.group(1)
 			value = m.group(2)
-			if param == 'echoCount':
+			if param == 'httpPort':
+				self.httpPort = int(value)
+			elif param == 'echoCount':
 				self.echoCount = int(value)
 			elif param == 'echoTimeout':
 				self.echoTimeout = int(value)

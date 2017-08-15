@@ -1,3 +1,5 @@
+httpPort = 8080
+
 # Number of ICMP packets per measurment
 echoCount = 10
 

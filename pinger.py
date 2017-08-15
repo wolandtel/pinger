@@ -7,12 +7,16 @@ if __name__ == '__main__':
 	
 	from lib.Event import Event
 	from lib.Probe import Probe
+	from lib.Server import Server
 	from threading import Lock
 	class Global:
 		pings = 0
 		pingLock = Lock()
-	
 	glb = Global()
+	
+	httpd = Server(cfg.httpPort)
+	httpd.start()
+	
 	event = Event()
 	probes = []
 	for host in cfg.hosts:
@@ -31,6 +35,8 @@ if __name__ == '__main__':
 	
 	for probe in probes:
 		probe.stop()
+	httpd.stop()
 	
 	for probe in probes:
 		probe.join()
+	httpd.join()

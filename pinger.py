@@ -7,10 +7,16 @@ if __name__ == '__main__':
 	
 	from lib.Event import Event
 	from lib.Probe import Probe
+	from threading import Lock
+	class Global:
+		pings = 0
+		pingLock = Lock()
+	
+	glb = Global()
 	event = Event()
 	probes = []
 	for host in cfg.hosts:
-		probe = Probe(len(probes), host, cfg, event)
+		probe = Probe(len(probes), host, cfg, glb, event)
 		probes.append(probe)
 		probe.start()
 	

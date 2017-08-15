@@ -118,6 +118,8 @@ class Config:
 					
 					self.hosts.append({'host': host, 'ip': ip, 'desc': desc})
 		
+		self.simultaneousPings = len(self.hosts)
+	
 	def ping (self, host = None, oneTime = False):
 		if oneTime:
 			count = 1

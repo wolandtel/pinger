@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import os, re, time
+import os, re, time, errno
 from threading import Thread
 from subprocess import Popen, PIPE
 
@@ -10,13 +10,14 @@ class Probe (Thread):
 	__changed = False
 	color = None
 	
-	def __init__ (self, idx, host, cfg, onChange):
+	def __init__ (self, idx, host, cfg, glb, onChange):
 		Thread.__init__(self)
 		
 		self.__idx = idx
 		self.__host = host['host']
 		self.__ip = host['ip']
 		self.__cfg = cfg
+		self.__glb = glb
 		self.__eventOnChange = onChange
 		self.desc = host['desc'][0:cfg.displayDesc]
 		
@@ -33,9 +34,29 @@ class Probe (Thread):
 				ping = self.__cfg.ping(self.__ip)
 			else:
 				ping = self.__cfg.ping(self.__host)
-	
-			proc = Popen(ping, stdout = PIPE, stderr = PIPE)
+			
+			self.__glb.pingLock.acquire()
+			if self.__glb.pings < self.__cfg.simultaneousPings:
+				self.__glb.pings += 1
+				self.__glb.pingLock.release()
+			else:
+				self.__glb.pingLock.release()
+				time.sleep(1)
+				continue
+			
+			try:
+				proc = Popen(ping, stdout = PIPE, stderr = PIPE)
+			except OSError as e:
+				self.__glb.pings -= 1
+				if e.errno.errorcode != errno.ENOMEM:
+					raise e
+				if self.__cfg.simultaneousPings > 1:
+					self.__cfg.simultaneousPings -= 1
+				continue
+			
 			(out, err) = proc.communicate()
+			self.__glb.pings -= 1
+			
 			found = False
 			for s in out.split('\n'):
 				m = False

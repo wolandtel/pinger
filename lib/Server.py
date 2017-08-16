@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import math
+import math, time
 from threading import Thread
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
@@ -12,8 +12,8 @@ class HTTPRequestHandler (BaseHTTPRequestHandler):
 			self.__rCss()
 		elif self.path == '/main.js':
 			self.__rJs()
-		elif self.path == '/flag':
-			self.__rFlag()
+		elif self.path == '/changed':
+			self.__rChanged()
 		else:
 			self.__send_headers()
 	
@@ -148,25 +148,46 @@ function SendRequest(r_method, r_path, r_args, r_handler)
 	}
 }
 
+online = true;
+changed = %d;
+
 setInterval(function () {
-		SendRequest('GET', '/flag', '', function (Request) {
+		SendRequest('GET', '/changed', '', function (Request) {
 				if (Request.status == 200)
 				{
-					document.getElementById('page').setAttribute('style', '');
-					if (Request.responseText == '1')
-						location.reload();
+					var needReload = false;
+					if (!online)
+					{
+						online = true;
+						document.getElementById('page').setAttribute('style', '');
+						needReload = true;
+					}
+					
+					if (Request.responseText > changed)
+					{
+						changed = Request.responseText;
+						needReload = true;
+					}
+					
+					if (needReload)
+						location.href='';
 				}
 				else
+				{
 					document.getElementById('page').setAttribute('style', 'opacity: 0.3');
+					online = false;
+				}
 			});
 	}, 1000);
-''')
+''' % self.server.lastChange)
 	
-	def __rFlag (self):
+	def __rChanged (self):
 		self.__send_headers('text/plain')
-		self.wfile.write(self.server.hasChanges())
+		self.wfile.write(self.server.lastChange)
 
 class CustomServer (HTTPServer):
+	lastChange = int(time.time())
+	
 	def __init__ (self, cfg, glb):
 		HTTPServer.__init__(self, (cfg.httpBind, cfg.httpPort), HTTPRequestHandler)
 		
@@ -192,11 +213,8 @@ class CustomServer (HTTPServer):
 		
 		return hosts
 	
-	def hasChanges (self):
-		if self.__glb.event.isSet():
-			self.__glb.event.clear()
-			return 1
-		return 0
+	def probesChanged (self):
+		self.lastChange = int(time.time())
 
 class Server (Thread):
 	__listen = ''
@@ -214,4 +232,7 @@ class Server (Thread):
 	
 	def stop (self):
 		self.__httpd.shutdown()
+	
+	def probesChanged (self):
+		self.__httpd.probesChanged()
 

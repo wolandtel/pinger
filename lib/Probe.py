@@ -10,7 +10,7 @@ class Probe (Thread):
 	__changed = False
 	color = None
 	
-	def __init__ (self, idx, host, cfg, glb, onChange):
+	def __init__ (self, idx, host, cfg, glb):
 		Thread.__init__(self)
 		
 		self.__idx = idx
@@ -18,7 +18,6 @@ class Probe (Thread):
 		self.__ip = host['ip']
 		self.__cfg = cfg
 		self.__glb = glb
-		self.__eventOnChange = onChange
 		self.desc = host['desc'][0:cfg.displayDesc]
 		
 		if self.__ip:
@@ -104,7 +103,7 @@ class Probe (Thread):
 	
 	def __onChange (self):
 		self.__changed = False
-		self.__eventOnChange.set(self.__idx)
+		self.__glb.event.set(self.__idx)
 	
 	def __setIp (self, ip = None):
 		if ip:

@@ -4,7 +4,10 @@ import os, sys, re
 from subprocess import Popen, PIPE
 
 class Config:
+	httpBind = ''
 	httpPort = 8080
+	
+	gridMaxWidth = 10
 	
 	# Number of ICMP packets per measurment
 	echoCount = 10
@@ -61,8 +64,12 @@ class Config:
 			
 			param = m.group(1)
 			value = m.group(2)
-			if param == 'httpPort':
+			if param == 'httpBind':
+				self.httpBind = value
+			elif param == 'httpPort':
 				self.httpPort = int(value)
+			elif param == 'gridMaxWidth':
+				self.gridMaxWidth = int(value)
 			elif param == 'echoCount':
 				self.echoCount = int(value)
 			elif param == 'echoTimeout':

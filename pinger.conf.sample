@@ -1,4 +1,7 @@
+httpBind = 
 httpPort = 8080
+
+gridMaxWidth = 10
 
 # Number of ICMP packets per measurment
 echoCount = 10

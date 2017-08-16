@@ -120,11 +120,8 @@ function SendRequest(r_method, r_path, r_args, r_handler)
 		//Если обмен данными завершен
 		if (Request.readyState == 4)
 		{
-			if (Request.status == 200)
-				//Передаем управление обработчику пользователя
-				r_handler(Request);
-			else
-				; // error
+			//Передаем управление обработчику пользователя
+			r_handler(Request);
 		}
 	}
 	
@@ -153,8 +150,14 @@ function SendRequest(r_method, r_path, r_args, r_handler)
 
 setInterval(function () {
 		SendRequest('GET', '/flag', '', function (Request) {
-				if (Request.responseText == '1')
-					location.reload();
+				if (Request.status == 200)
+				{
+					document.getElementById('page').setAttribute('style', '');
+					if (Request.responseText == '1')
+						location.reload();
+				}
+				else
+					document.getElementById('page').setAttribute('style', 'opacity: 0.3');
 			});
 	}, 1000);
 ''')

@@ -12,6 +12,8 @@ class HTTPRequestHandler (BaseHTTPRequestHandler):
 			self.__rCss()
 		elif self.path == '/main.js':
 			self.__rJs()
+		elif self.path == '/flag':
+			self.__rFlag()
 		else:
 			self.__send_headers()
 	
@@ -71,8 +73,95 @@ class HTTPRequestHandler (BaseHTTPRequestHandler):
 	def __rJs (self):
 		self.__send_headers('text/javascript')
 		self.wfile.write('''
-setInterval(function () { window.location.reload(); }, 10000)
+function CreateRequest()
+{
+	var Request = false;
+	
+	if (window.XMLHttpRequest)
+	{
+		//Gecko-совместимые браузеры, Safari, Konqueror
+		Request = new XMLHttpRequest();
+	}
+	else if (window.ActiveXObject)
+	{
+		//Internet explorer
+		try
+		{
+			Request = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		catch (CatchException)
+		{
+			Request = new ActiveXObject("Msxml2.XMLHTTP");
+		}
+	}
+	
+	return Request;
+} 
+
+/*
+Функция посылки запроса к файлу на сервере
+r_method  - тип запроса: GET или POST
+r_path    - путь к файлу
+r_args    - аргументы вида a=1&b=2&c=3...
+r_handler - функция-обработчик ответа от сервера
+*/
+function SendRequest(r_method, r_path, r_args, r_handler)
+{
+	//Создаём запрос
+	var Request = CreateRequest();
+	
+	//Проверяем существование запроса еще раз
+	if (!Request)
+		return;
+	
+	//Назначаем пользовательский обработчик
+	Request.onreadystatechange = function()
+	{
+		//Если обмен данными завершен
+		if (Request.readyState == 4)
+		{
+			if (Request.status == 200)
+				//Передаем управление обработчику пользователя
+				r_handler(Request);
+			else
+				; // error
+		}
+	}
+	
+	//Проверяем, если требуется сделать GET-запрос
+	if (r_method.toLowerCase() == "get" && r_args.length > 0)
+		r_path += "?" + r_args;
+	
+	//Инициализируем соединение1
+	Request.open(r_method, r_path, true);
+	
+	if (r_method.toLowerCase() == "post")
+	{
+		//Если это POST-запрос
+		
+		//Устанавливаем заголовок
+		Request.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
+		//Посылаем запрос
+		Request.send(r_args);
+	}
+	else
+	{
+		//Посылаем нуль-запрос
+		Request.send(null);
+	}
+}
+
+setInterval(function () {
+		SendRequest('GET', '/flag', '', function (Request) {
+				if (Request.responseText == '1')
+					location.reload();
+			});
+	}, 1000);
 ''')
+	
+	def __rFlag (self):
+		self.__send_headers('text/plain')
+		self.wfile.write(self.server.hasChanges())
 
 class CustomServer (HTTPServer):
 	def __init__ (self, cfg, glb):
@@ -99,6 +188,12 @@ class CustomServer (HTTPServer):
 				(width, width, color, bgColor, probe.desc.replace('\n', '<br />'))
 		
 		return hosts
+	
+	def hasChanges (self):
+		if self.__glb.event.isSet():
+			self.__glb.event.clear()
+			return 1
+		return 0
 
 class Server (Thread):
 	__listen = ''
@@ -116,7 +211,4 @@ class Server (Thread):
 	
 	def stop (self):
 		self.__httpd.shutdown()
-	
-	def probesChanged (self):
-		pass
 

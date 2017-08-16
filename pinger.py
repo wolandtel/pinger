@@ -25,10 +25,7 @@ if __name__ == '__main__':
 		probe.start()
 	
 	while cfg.appDirFile(cfg.pidFile):
-		glb.event.wait(cfg.eventTimeout)
-		if (glb.event.isSet()):
-			httpd.probesChanged()
-			glb.event.clear()
+		pass
 	
 	for probe in glb.probes:
 		probe.stop()

@@ -129,6 +129,8 @@ class Config:
 					
 					self.hosts.append({'host': host, 'ip': ip, 'desc': desc})
 		
+		c.close()
+		
 		self.simultaneousPings = len(self.hosts)
 	
 	def ping (self, host = None, oneTime = False):
@@ -145,13 +147,13 @@ class Config:
 		
 		return ping
 	
-	def appDirFile (self, fileName):
+	def appDirFile (self, fileName, absent = False):
 		if fileName[0] == '/':
 			path = fileName
 		else:
 			path = os.path.join(self.appDir, fileName)
 		
-		if os.path.exists(path):
+		if absent or os.path.exists(path):
 			return path
 		
 		return None

@@ -189,6 +189,7 @@ class CustomServer (HTTPServer):
 	lastChange = int(time.time())
 	
 	def __init__ (self, cfg, glb):
+		HTTPServer.allow_reuse_address = True
 		HTTPServer.__init__(self, (cfg.httpBind, cfg.httpPort), HTTPRequestHandler)
 		
 		self.__cfg = cfg
@@ -228,7 +229,10 @@ class Server (Thread):
 		self.__httpd = CustomServer(cfg, glb)
 	
 	def run (self):
-		self.__httpd.serve_forever()
+		try:
+			self.__httpd.serve_forever()
+		except:
+			pass
 	
 	def stop (self):
 		self.__httpd.shutdown()

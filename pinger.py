@@ -7,13 +7,16 @@ if __name__ == '__main__':
 	cfg = Config()
 	
 	pid = os.fork ()
-	if pid == 0:
-		time.sleep(0.1)
-	else:
+	if pid:
 		p = open(cfg.appDirFile(cfg.pidFile, True), 'w')
 		p.write(str(pid))
 		p.close()
 		sys.exit(0)
+	
+	time.sleep(0.1)
+	log = open(cfg.appDirFile(cfg.logFile, True), 'a')
+	if log:
+		sys.stdout = log
 	
 	from lib.Event import Event
 	from lib.Probe import Probe
@@ -40,8 +43,8 @@ if __name__ == '__main__':
 			if (glb.event.isSet()):
 				httpd.probesChanged()
 				glb.event.clear()
-	except:
-		pass
+	except Exception as e:
+		print e
 	
 	for probe in glb.probes:
 		probe.stop()

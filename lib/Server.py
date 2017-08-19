@@ -231,8 +231,8 @@ class Server (Thread):
 	def run (self):
 		try:
 			self.__httpd.serve_forever()
-		except:
-			pass
+		except Exception as e:
+			print e
 	
 	def stop (self):
 		self.__httpd.shutdown()

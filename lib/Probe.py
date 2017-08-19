@@ -101,8 +101,8 @@ class Probe (Thread):
 				while self.__running and (interval > 0):
 					time.sleep(1)
 					interval -= 1
-		except:
-			pass
+		except Exception as e:
+			print e
 	
 	def __onChange (self):
 		self.__changed = False

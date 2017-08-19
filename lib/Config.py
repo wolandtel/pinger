@@ -43,6 +43,7 @@ class Config:
 	eventTimeout = 1
 	
 	pidFile = 'pid'
+	logFile = 'pinger.log'
 	appDir = os.path.dirname(sys.argv[0])
 	
 	def __init__ (self, cfgPath = 'pinger.conf'):

@@ -44,6 +44,8 @@ if __name__ == '__main__':
 			if (glb.event.isSet()):
 				httpd.probesChanged()
 				glb.event.clear()
+			if log:
+				log.flush()
 	except Exception as e:
 		print e
 	

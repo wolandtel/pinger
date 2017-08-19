@@ -127,7 +127,7 @@ class Config:
 					else:
 						ip = None
 					
-					self.hosts.append({'host': host, 'ip': ip, 'desc': desc})
+					self.hosts.append({'host': host, 'ip': ip, 'desc': unicode(desc, 'utf8')})
 		
 		c.close()
 		

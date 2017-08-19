@@ -210,7 +210,7 @@ class CustomServer (HTTPServer):
 				color = '#000'
 			
 			hosts += '<div class="host" style="width: calc(%f%% - 2px); padding-top: calc(%f%% - 2px); color: %s; background-color: %s"><div class="text">%s</div></div>' % \
-				(width, width, color, bgColor, probe.desc.replace('\n', '<br />'))
+				(width, width, color, bgColor, probe.desc.replace('\n', '<br />').encode('utf8'))
 		
 		return hosts
 	

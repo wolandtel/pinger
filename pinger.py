@@ -13,10 +13,11 @@ if __name__ == '__main__':
 		p.close()
 		sys.exit(0)
 	
-	time.sleep(0.1)
 	log = open(cfg.appDirFile(cfg.logFile, True), 'a')
 	if log:
 		sys.stdout = log
+		sys.stderr = log
+	time.sleep(0.1)
 	
 	from lib.Event import Event
 	from lib.Probe import Probe

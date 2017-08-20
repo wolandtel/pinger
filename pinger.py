@@ -36,6 +36,9 @@ if __name__ == '__main__':
 		LOG_DEBUG = 3
 		
 		def log (self, msg, logLevel = LOG_ERROR):
+			if logLevel == LOG_ERROR:
+				self.stop()
+			
 			if logLevel > cfg.logLevel:
 				return
 			
@@ -45,6 +48,9 @@ if __name__ == '__main__':
 			logLine.append(levelMsg[logLevel])
 			logLine.append(msg)
 			print '[%d-%02d-%02d %02d:%02d:%02d] %s: %s' % tuple(logLine)
+		
+		def stop (self):
+			os.unlink(cfg.appDirFile(cfg.pidFile))
 	
 	glb = Global()
 	

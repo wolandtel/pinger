@@ -102,7 +102,7 @@ class Probe (Thread):
 					time.sleep(1)
 					interval -= 1
 		except Exception as e:
-			print e
+			self.__glb.log(e)
 	
 	def __onChange (self):
 		self.__changed = False

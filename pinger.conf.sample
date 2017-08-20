@@ -1,3 +1,6 @@
+# LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBUG
+logLevel = 3
+
 httpBind = 
 httpPort = 8080
 

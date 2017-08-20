@@ -28,8 +28,27 @@ if __name__ == '__main__':
 		pingLock = Lock()
 		event = Event()
 		probes = []
+		cfg = cfg
+
+		LOG_ERROR = 0
+		LOG_WARNING = 1
+		LOG_INFO = 2
+		LOG_DEBUG = 3
+		
+		def log (self, msg, logLevel = LOG_ERROR):
+			if logLevel > cfg.logLevel:
+				return
+			
+			levelMsg = ['ERROR', 'WARNING', 'INFO', 'DEBUG']
+			
+			logLine = list(time.localtime())[:6]
+			logLine.append(levelMsg[logLevel])
+			logLine.append(msg)
+			print '[%d-%02d-%02d %02d:%02d:%02d] %s: %s' % tuple(logLine)
+	
 	glb = Global()
 	
+	glb.log('+++ Starting…', glb.LOG_INFO);
 	httpd = Server(cfg, glb)
 	httpd.start()
 	
@@ -42,12 +61,14 @@ if __name__ == '__main__':
 		while cfg.appDirFile(cfg.pidFile):
 			glb.event.wait(0.1)
 			if (glb.event.isSet()):
+				glb.log('Probes have been changed', glb.LOG_INFO)
 				httpd.probesChanged()
 				glb.event.clear()
 			if log:
 				log.flush()
+		glb.log('--- Stopping…', glb.LOG_INFO)
 	except Exception as e:
-		print e
+		glb.log(e)
 	
 	for probe in glb.probes:
 		probe.stop()
@@ -56,3 +77,5 @@ if __name__ == '__main__':
 	for probe in glb.probes:
 		probe.join()
 	httpd.join()
+	
+	glb.log('*** Bye', glb.LOG_INFO)

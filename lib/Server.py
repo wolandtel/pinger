@@ -232,7 +232,7 @@ class Server (Thread):
 		try:
 			self.__httpd.serve_forever()
 		except Exception as e:
-			print e
+			self.__glb.log(e)
 	
 	def stop (self):
 		self.__httpd.shutdown()

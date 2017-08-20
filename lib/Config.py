@@ -4,6 +4,9 @@ import os, sys, re
 from subprocess import Popen, PIPE
 
 class Config:
+	# LOG_ERROR, LOG_WARNING, LOG_INFO, LOG_DEBUG
+	logLevel = 0
+	
 	httpBind = ''
 	httpPort = 8080
 	
@@ -65,7 +68,9 @@ class Config:
 			
 			param = m.group(1)
 			value = m.group(2)
-			if param == 'httpBind':
+			if param == 'logLevel':
+				self.logLevel = int(value)
+			elif param == 'httpBind':
 				self.httpBind = value
 			elif param == 'httpPort':
 				self.httpPort = int(value)

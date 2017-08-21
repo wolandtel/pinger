@@ -19,6 +19,7 @@ if __name__ == '__main__':
 		sys.stderr = log
 	time.sleep(0.1)
 	
+	import signal
 	from lib.Event import Event
 	from lib.Probe import Probe
 	from lib.Server import Server
@@ -36,7 +37,7 @@ if __name__ == '__main__':
 		LOG_DEBUG = 3
 		
 		def log (self, msg, logLevel = LOG_ERROR):
-			if logLevel == LOG_ERROR:
+			if logLevel == self.LOG_ERROR:
 				self.stop()
 			
 			if logLevel > cfg.logLevel:
@@ -53,6 +54,19 @@ if __name__ == '__main__':
 			os.unlink(cfg.appDirFile(cfg.pidFile))
 	
 	glb = Global()
+	
+	def sigHandler (signum, frame):
+		if signum == signal.SIGHUP:
+			glb.log('SIGHUP received', glb.LOG_INFO)
+			return
+		
+		if signum == signal.SIGTERM:
+			glb.log('Killed with SIGTERM', glb.LOG_INFO)
+			glb.stop()
+	
+	signal.signal(signal.SIGHUP, sigHandler);
+	signal.signal(signal.SIGTERM, sigHandler);
+	#signal.signal(signal.SIG, sigHandler);
 	
 	glb.log('+++ Starting…', glb.LOG_INFO);
 	httpd = Server(cfg, glb)
